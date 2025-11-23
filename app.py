@@ -16,11 +16,293 @@ HTML_TEMPLATE = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Agent Tourism System</title>
     <style>
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: #f3f4f6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        body.dark-mode {
+            background: #1a1a1a;
+            color: #e5e7eb;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            max-width: 720px;
+            width: 100%;
+            padding: 48px 40px;
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .container {
+            background: #2d2d2d;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 12px;
+            font-size: 2.2em;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        body.dark-mode h1 {
+            color: #e5e7eb;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 32px;
+            font-size: 1em;
+            font-weight: 400;
+        }
+        body.dark-mode .subtitle {
+            color: #9ca3af;
+        }
+        .theme-toggle {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.2s ease;
+        }
+        .theme-toggle:hover {
+            background: #e5e7eb;
+        }
+        body.dark-mode .theme-toggle {
+            background: #3d3d3d;
+            border-color: #4d4d4d;
+            color: #e5e7eb;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+        body.dark-mode input[type="text"] {
+            background: #3d3d3d;
+            border-color: #4d4d4d;
+            color: #e5e7eb;
+        }
+        input[type="text"]:hover {
+            border-color: #9ca3af;
+            background: #ffffff;
+        }
+        body.dark-mode input[type="text"]:hover {
+            background: #4d4d4d;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        body.dark-mode input[type="text"]:focus {
+            background: #4d4d4d;
+        }
+        button {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+        }
+        button:hover {
+            background: #5568d3;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(102, 126, 234, 0.2);
+        }
+        .response {
+            margin-top: 28px;
+            padding: 24px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            white-space: pre-wrap;
+            line-height: 1.7;
+            min-height: 50px;
+            color: #374151;
+            font-size: 15px;
+            position: relative;
+        }
+        body.dark-mode .response {
+            background: #3d3d3d;
+            border-color: #4d4d4d;
+            color: #e5e7eb;
+        }
+        .response-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .action-btn:hover {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        body.dark-mode .action-btn {
+            background: #4d4d4d;
+            border-color: #5d5d5d;
+            color: #e5e7eb;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            margin-top: 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .search-history {
+            position: relative;
+            margin-top: 8px;
+        }
+        .history-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        body.dark-mode .history-dropdown {
+            background: #2d2d2d;
+            border-color: #4d4d4d;
+        }
+        .history-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-item:hover {
+            background: #f9fafb;
+        }
+        body.dark-mode .history-item {
+            border-color: #3d3d3d;
+        }
+        body.dark-mode .history-item:hover {
+            background: #3d3d3d;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .clear-history {
+            padding: 8px 16px;
+            text-align: center;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 13px;
+            border-top: 1px solid #f3f4f6;
+        }
+        body.dark-mode .clear-history {
+            border-color: #3d3d3d;
+        }
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .quick-btn {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+        .quick-btn:hover {
+            background: #e5e7eb;
+            transform: translateY(-1px);
+        }
+        body.dark-mode .quick-btn {
+            background: #3d3d3d;
+            border-color: #4d4d4d;
+            color: #e5e7eb;
+        }
+        body.dark-mode .quick-btn:hover {
+            background: #4d4d4d;
+        }
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -31,500 +313,253 @@ HTML_TEMPLATE = """
                 transform: translateY(0);
             }
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
-        .container {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.15),
-                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
-            max-width: 840px;
-            width: 100%;
-            padding: 48px 40px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 32px 24px;
-                border-radius: 20px;
-            }
-        }
-        
-        h1 {
-            color: #1a1a1a;
-            margin-bottom: 12px;
-            font-size: clamp(2rem, 5vw, 2.75rem);
-            font-weight: 700;
-            line-height: 1.2;
-            letter-spacing: -0.02em;
-        }
-        
-        .subtitle {
-            color: #6b7280;
-            margin-bottom: 40px;
-            font-size: clamp(1rem, 2.5vw, 1.125rem);
-            line-height: 1.6;
-            font-weight: 400;
-        }
-        
-        .input-group {
-            margin-bottom: 24px;
-            position: relative;
-        }
-        
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        
-        .input-icon {
-            position: absolute;
-            left: 18px;
-            color: #9ca3af;
-            font-size: 20px;
-            pointer-events: none;
-            transition: color 0.3s ease;
-        }
-        
-        input[type="text"] {
-            width: 100%;
-            padding: 18px 18px 18px 52px;
-            font-size: 16px;
-            border: 2px solid #e5e7eb;
-            border-radius: 14px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #ffffff;
-            color: #1f2937;
-            font-weight: 400;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-        
-        input[type="text"]::placeholder {
-            color: #9ca3af;
-            font-weight: 400;
-        }
-        
-        input[type="text"]:hover {
-            border-color: #d1d5db;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
-        }
-        
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 
-                0 0 0 4px rgba(102, 126, 234, 0.1),
-                0 4px 12px rgba(102, 126, 234, 0.15);
-            transform: translateY(-1px);
-        }
-        
-        input[type="text"]:focus + .input-icon,
-        input[type="text"]:focus ~ .input-icon {
-            color: #667eea;
-        }
-        
-        button {
-            width: 100%;
-            padding: 18px 24px;
-            font-size: 16px;
-            font-weight: 600;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            background-size: 200% 200%;
-            color: white;
-            border: none;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
-                0 4px 14px rgba(102, 126, 234, 0.4),
-                0 2px 4px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 8px 20px rgba(102, 126, 234, 0.5),
-                0 4px 8px rgba(0, 0, 0, 0.15);
-            background-position: right center;
-        }
-        
-        button:hover::before {
-            left: 100%;
-        }
-        
-        button:active {
-            transform: translateY(0);
-            box-shadow: 
-                0 2px 8px rgba(102, 126, 234, 0.4),
-                0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-        
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 32px;
-            padding: 24px;
-        }
-        
-        .loading.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(102, 126, 234, 0.2);
-            border-top-color: #667eea;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 12px;
-        }
-        
-        .loading-text {
-            color: #667eea;
-            font-size: 15px;
-            font-weight: 500;
-            margin-top: 8px;
-        }
-        
-        .response {
-            margin-top: 32px;
-            padding: 0;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.1),
-                0 0 0 1px rgba(102, 126, 234, 0.1) inset;
-            min-height: 60px;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.4s ease, transform 0.4s ease;
-            overflow: hidden;
-        }
-        
-        .response.show {
-            opacity: 1;
-            transform: translateY(0);
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .response-content {
-            padding: 28px;
-            white-space: pre-wrap;
-            line-height: 1.8;
-            color: #1f2937;
-            font-size: 15px;
-        }
-        
-        .response-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        
         .weather-icon {
-            font-size: 32px;
-            line-height: 1;
+            font-size: 2em;
+            display: inline-block;
+            margin-right: 8px;
         }
-        
-        .response-title {
-            font-weight: 600;
-            font-size: 18px;
-            color: #1f2937;
-        }
-        
-        .places-list {
-            margin-top: 20px;
-            padding-left: 0;
-            list-style: none;
-        }
-        
-        .places-list li {
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            color: #374151;
-            font-size: 15px;
-            position: relative;
-            padding-left: 24px;
-        }
-        
-        .places-list li:last-child {
-            border-bottom: none;
-        }
-        
-        .places-list li::before {
-            content: '📍';
-            position: absolute;
-            left: 0;
-            font-size: 16px;
-        }
-        
-        .more-details {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        
-        .details-toggle {
-            background: rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            color: #667eea;
-            padding: 10px 16px;
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #2c3e50;
+            color: white;
+            padding: 12px 20px;
             border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            width: 100%;
-            text-align: left;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
         }
-        
-        .details-toggle:hover {
-            background: rgba(102, 126, 234, 0.15);
-            border-color: rgba(102, 126, 234, 0.3);
+        .toast.show {
+            display: block;
+            animation: slideIn 0.3s ease;
         }
-        
-        .details-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease, padding 0.3s ease;
-            padding: 0 16px;
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 8px;
-            margin-top: 12px;
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
-        
-        .details-content.expanded {
-            max-height: 500px;
-            padding: 16px;
-        }
-        
-        .error {
-            border-left: 4px solid #ef4444;
-            background: rgba(239, 68, 68, 0.05);
-        }
-        
         @media (max-width: 768px) {
-            body {
-                padding: 16px;
-            }
-            
-            h1 {
-                margin-bottom: 8px;
-            }
-            
-            .subtitle {
-                margin-bottom: 32px;
-                font-size: 0.95rem;
-            }
-            
-            input[type="text"] {
-                padding: 16px 16px 16px 48px;
-                font-size: 16px;
-            }
-            
-            button {
-                padding: 16px 20px;
-                font-size: 15px;
-            }
-            
-            .response-content {
-                padding: 20px;
-                font-size: 14px;
+            .response-actions {
+                position: static;
+                margin-top: 12px;
+                justify-content: flex-start;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌍 Tourism AI System</h1>
-        <p class="subtitle">Get weather and tourist attraction information for any place</p>
+        <div class="header">
+            <div>
+                <h1>Tourism Planner</h1>
+                <p class="subtitle">Find weather and attractions for your destination</p>
+            </div>
+            <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+        </div>
         
         <form id="queryForm">
             <div class="input-group">
-                <div class="input-wrapper">
-                    <span class="input-icon">🔍</span>
-                    <input type="text" id="userInput" name="query" 
-                           placeholder="Enter a city name and ask about weather or places to visit" 
-                           required>
-                </div>
+                <input type="text" id="userInput" name="query" 
+                       placeholder="Enter a city name and ask about weather or places to visit" 
+                       maxlength="200"
+                       required>
+                <div class="char-counter" id="charCounter">0 / 200</div>
             </div>
-            <button type="submit" id="submitBtn">Get Information</button>
+            
+            <div class="quick-actions">
+                <div class="quick-btn" onclick="quickSearch('Paris')">🗼 Paris</div>
+                <div class="quick-btn" onclick="quickSearch('Tokyo')">🗾 Tokyo</div>
+                <div class="quick-btn" onclick="quickSearch('New York')">🗽 New York</div>
+                <div class="quick-btn" onclick="quickSearch('London')">🏰 London</div>
+                <div class="quick-btn" onclick="quickSearch('Dubai')">🏜️ Dubai</div>
+            </div>
+            
+            <div class="search-history">
+                <div class="history-dropdown" id="historyDropdown"></div>
+            </div>
+            
+            <button type="submit">Get Information</button>
         </form>
         
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <div class="loading-text">Processing your request...</div>
+            <div>Processing your request...</div>
         </div>
         
         <div class="response" id="response"></div>
     </div>
+    
+    <div class="toast" id="toast"></div>
 
     <script>
-        function getWeatherIcon(text) {
-            const lowerText = text.toLowerCase();
-            if (lowerText.includes('rain') || lowerText.includes('precipitation')) {
-                return '🌧️';
-            } else if (lowerText.includes('sun') || lowerText.includes('clear')) {
-                return '☀️';
-            } else if (lowerText.includes('cloud')) {
-                return '☁️';
-            } else if (lowerText.includes('snow')) {
-                return '❄️';
-            } else if (lowerText.includes('storm')) {
-                return '⛈️';
-            } else if (lowerText.includes('fog') || lowerText.includes('mist')) {
-                return '🌫️';
-            }
-            return '🌤️';
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const userInput = document.getElementById('userInput');
+        const charCounter = document.getElementById('charCounter');
+        const historyDropdown = document.getElementById('historyDropdown');
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            themeToggle.textContent = '☀️';
         }
         
-        function formatResponse(text) {
-            const hasWeather = text.toLowerCase().includes('temperature') || text.toLowerCase().includes('°c');
-            const hasPlaces = text.includes('\n') && text.split('\n').length > 2;
-            
-            let html = '';
-            
-            if (hasWeather) {
-                const weatherIcon = getWeatherIcon(text);
-                html += '<div class="response-header">';
-                html += `<span class="weather-icon">${weatherIcon}</span>`;
-                html += '<span class="response-title">Weather Information</span>';
-                html += '</div>';
-            }
-            
-            const parts = text.split('\n\n');
-            let mainContent = '';
-            let placesList = '';
-            
-            parts.forEach(part => {
-                if (part.includes('°C') || part.includes('temperature')) {
-                    mainContent += `<div style="margin-bottom: 16px;">${part}</div>`;
-                } else if (part.includes('places you can go')) {
-                    mainContent += `<div style="margin-bottom: 12px; font-weight: 500;">${part.split(':')[0]}:</div>`;
-                    const places = part.split('\n').slice(1).filter(p => p.trim());
-                    if (places.length > 0) {
-                        placesList = '<ul class="places-list">';
-                        places.forEach(place => {
-                            if (place.trim()) {
-                                placesList += `<li>${place.trim()}</li>`;
-                            }
-                        });
-                        placesList += '</ul>';
-                    }
-                } else if (part.trim()) {
-                    mainContent += `<div>${part}</div>`;
-                }
-            });
-            
-            if (!hasWeather && !mainContent) {
-                mainContent = text;
-            }
-            
-            html += '<div class="response-content">';
-            html += mainContent;
-            if (placesList) {
-                html += placesList;
-            }
-            
-            if (hasWeather || hasPlaces) {
-                html += '<div class="more-details">';
-                html += '<button type="button" class="details-toggle" onclick="toggleDetails(this)">';
-                html += '<span>ℹ️ More Details</span>';
-                html += '</button>';
-                html += '<div class="details-content">';
-                html += '<p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 1.6;">';
-                html += 'This information is fetched in real-time using open-source APIs. ';
-                html += 'Weather data is provided by Open-Meteo, and tourist attractions are sourced from OpenStreetMap.';
-                html += '</p>';
-                html += '</div>';
-                html += '</div>';
-            }
-            
-            html += '</div>';
-            return html;
-        }
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            themeToggle.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
         
-        function toggleDetails(button) {
-            const content = button.nextElementSibling;
-            const isExpanded = content.classList.contains('expanded');
-            
-            if (isExpanded) {
-                content.classList.remove('expanded');
-                button.querySelector('span').textContent = 'ℹ️ More Details';
+        // Character counter
+        userInput.addEventListener('input', (e) => {
+            const length = e.target.value.length;
+            charCounter.textContent = `${length} / 200`;
+            if (length > 180) {
+                charCounter.style.color = '#ef4444';
             } else {
-                content.classList.add('expanded');
-                button.querySelector('span').textContent = 'ℹ️ Less Details';
+                charCounter.style.color = '#9ca3af';
+            }
+        });
+        
+        // Search history management
+        function getSearchHistory() {
+            const history = localStorage.getItem('searchHistory');
+            return history ? JSON.parse(history) : [];
+        }
+        
+        function saveToHistory(query) {
+            let history = getSearchHistory();
+            history = history.filter(item => item.toLowerCase() !== query.toLowerCase());
+            history.unshift(query);
+            history = history.slice(0, 5); // Keep last 5
+            localStorage.setItem('searchHistory', JSON.stringify(history));
+            displayHistory();
+        }
+        
+        function displayHistory() {
+            const history = getSearchHistory();
+            if (history.length === 0) {
+                historyDropdown.style.display = 'none';
+                return;
+            }
+            
+            historyDropdown.innerHTML = history.map(item => 
+                `<div class="history-item" onmousedown="selectHistory('${item.replace(/'/g, "\\'")}')">
+                    <span>🕐 ${item}</span>
+                </div>`
+            ).join('') + 
+            `<div class="clear-history" onmousedown="clearHistory()">Clear History</div>`;
+        }
+        
+        function selectHistory(query) {
+            userInput.value = query;
+            historyDropdown.style.display = 'none';
+            document.getElementById('queryForm').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        }
+        
+        function clearHistory() {
+            localStorage.removeItem('searchHistory');
+            historyDropdown.style.display = 'none';
+        }
+        
+        // Show history on focus
+        userInput.addEventListener('focus', () => {
+            displayHistory();
+            if (getSearchHistory().length > 0) {
+                historyDropdown.style.display = 'block';
+            }
+        });
+        
+        userInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                historyDropdown.style.display = 'none';
+            }, 200);
+        });
+        
+        // Quick search
+        function quickSearch(city) {
+            userInput.value = `I'm going to ${city}, what is the temperature there? And what are the places I can visit?`;
+            document.getElementById('queryForm').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        }
+        
+        // Get weather icon based on temperature
+        function getWeatherIcon(temp) {
+            if (temp >= 30) return '☀️';
+            if (temp >= 20) return '🌤️';
+            if (temp >= 10) return '⛅';
+            if (temp >= 0) return '🌥️';
+            return '❄️';
+        }
+        
+        // Toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('✅ Copied to clipboard!');
+            }).catch(() => {
+                showToast('❌ Failed to copy');
+            });
+        }
+        
+        // Share functionality
+        function shareResults(text) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Tourism Information',
+                    text: text
+                }).catch(() => showToast('Share cancelled'));
+            } else {
+                copyToClipboard(text);
             }
         }
         
+        // Export as text
+        function exportResults(text) {
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tourism-info-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('📥 File downloaded!');
+        }
+        
+        // Form submission
         document.getElementById('queryForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const input = document.getElementById('userInput').value;
+            const input = userInput.value.trim();
             const responseDiv = document.getElementById('response');
             const loadingDiv = document.getElementById('loading');
-            const submitBtn = document.getElementById('submitBtn');
             
-            responseDiv.innerHTML = '';
-            responseDiv.classList.remove('show', 'error');
-            loadingDiv.classList.add('active');
-            submitBtn.disabled = true;
+            if (!input) return;
+            
+            // Save to history
+            saveToHistory(input);
+            
+            responseDiv.textContent = '';
+            responseDiv.classList.remove('fade-in');
+            loadingDiv.style.display = 'block';
             
             try {
                 const response = await fetch('/query', {
@@ -535,27 +570,62 @@ HTML_TEMPLATE = """
                     body: JSON.stringify({ query: input })
                 });
                 
-                const data = await response.json();
-                loadingDiv.classList.remove('active');
-                submitBtn.disabled = false;
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
                 
-                if (data.success) {
-                    responseDiv.innerHTML = formatResponse(data.response);
-                    responseDiv.classList.add('show');
-                    setTimeout(() => {
-                        responseDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }, 100);
+                const data = await response.json();
+                loadingDiv.style.display = 'none';
+                
+                if (data.success && data.response) {
+                    const responseText = data.response;
+                    
+                    // Extract temperature for weather icon
+                    let weatherIcon = '';
+                    const tempMatch = responseText.match(/(\d+)°C/);
+                    if (tempMatch) {
+                        const temp = parseInt(tempMatch[1]);
+                        weatherIcon = `<span class="weather-icon">${getWeatherIcon(temp)}</span>`;
+                    }
+                    
+                    responseDiv.innerHTML = `
+                        <div class="response-actions">
+                            <div class="action-btn" onclick="copyToClipboard(\`${responseText.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                                📋 Copy
+                            </div>
+                            <div class="action-btn" onclick="shareResults(\`${responseText.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                                🔗 Share
+                            </div>
+                            <div class="action-btn" onclick="exportResults(\`${responseText.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                                💾 Export
+                            </div>
+                        </div>
+                        <div style="padding-right: 120px;">${weatherIcon}${escapeHtml(responseText)}</div>
+                    `;
+                    responseDiv.classList.add('fade-in');
                 } else {
-                    responseDiv.innerHTML = `<div class="response-content" style="color: #ef4444;">Error: ${data.error}</div>`;
-                    responseDiv.classList.add('show', 'error');
+                    const errorMsg = data.error || 'No response received from server';
+                    responseDiv.textContent = '❌ Error: ' + errorMsg;
+                    responseDiv.style.borderLeftColor = '#ef4444';
+                    responseDiv.classList.add('fade-in');
                 }
             } catch (error) {
-                loadingDiv.classList.remove('active');
-                submitBtn.disabled = false;
-                responseDiv.innerHTML = `<div class="response-content" style="color: #ef4444;">Error: ${error.message}</div>`;
-                responseDiv.classList.add('show', 'error');
+                loadingDiv.style.display = 'none';
+                const errorMsg = error.message || 'Network error occurred';
+                responseDiv.textContent = '❌ Error: ' + errorMsg;
+                responseDiv.style.borderLeftColor = '#e74c3c';
+                responseDiv.classList.add('fade-in');
             }
         });
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Load history on page load
+        displayHistory();
     </script>
 </body>
 </html>
@@ -571,6 +641,12 @@ def query():
     """Handle API queries"""
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid request data'
+            }), 400
+            
         user_input = data.get('query', '').strip()
         
         if not user_input:
@@ -582,12 +658,21 @@ def query():
         # Process the request using the tourism agent
         response = agent.process_request(user_input)
         
+        if not response:
+            return jsonify({
+                'success': False,
+                'error': 'No response generated'
+            }), 500
+        
         return jsonify({
             'success': True,
             'response': response
         })
         
     except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"Error in query endpoint: {error_trace}")
         return jsonify({
             'success': False,
             'error': str(e)

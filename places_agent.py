@@ -41,6 +41,8 @@ class PlacesAgent:
             # Reduced delay for faster processing
             time.sleep(0.5)
             
+            print(f"[DEBUG] Fetching coordinates for: {place_name}")
+            
             # Enhanced search parameters for better global city matching
             params = {
                 "q": place_name,
@@ -54,10 +56,13 @@ class PlacesAgent:
                 "User-Agent": "Tourism-AI-Agent/1.0"
             }
             
-            response = requests.get(self.nominatim_url, params=params, headers=headers, timeout=10)
+            print(f"[DEBUG] Making request to Nominatim API...")
+            response = requests.get(self.nominatim_url, params=params, headers=headers, timeout=5)
+            print(f"[DEBUG] Nominatim API responded with status: {response.status_code}")
             response.raise_for_status()
             
             data = response.json()
+            print(f"[DEBUG] Received {len(data)} results from Nominatim")
             
             if data and len(data) > 0:
                 # Collect all potential matches
@@ -89,6 +94,7 @@ class PlacesAgent:
                     best_match = candidates[0]
                     result = (best_match[1], best_match[2])
                     self._coordinate_cache[normalized_name] = result
+                    print(f"[DEBUG] Found coordinates: {result}")
                     return result
                 
                 # Fallback: use first result
@@ -98,9 +104,11 @@ class PlacesAgent:
                 if lat != 0 and lon != 0:
                     result = (lat, lon)
                     self._coordinate_cache[normalized_name] = result
+                    print(f"[DEBUG] Found coordinates (fallback): {result}")
                     return result
             
             # Cache None result to avoid repeated failed lookups
+            print(f"[DEBUG] No coordinates found for {place_name}")
             self._coordinate_cache[normalized_name] = None
             return None
             
@@ -260,27 +268,30 @@ class PlacesAgent:
     def _execute_overpass_query(self, query: str, limit: int, seen_names: Set[str]) -> List[str]:
         """Execute Overpass query and extract place names"""
         try:
+            print(f"[DEBUG] Executing Overpass query...")
             response = requests.post(
                 self.overpass_url,
                 data={"data": query},
-                timeout=20
+                timeout=10
             )
+            print(f"[DEBUG] Overpass API responded with status: {response.status_code}")
             response.raise_for_status()
             
             data = response.json()
             places: List[str] = []
             
             if "elements" in data:
+                print(f"[DEBUG] Found {len(data['elements'])} elements from Overpass")
                 for element in data["elements"]:
                     if len(places) >= limit:
                         break
                     
                     tags = element.get("tags", {})
                     # Try multiple name fields for international support
-                    name = (tags.get("name") or 
-                           tags.get("name:en") or 
+                    name = (tags.get("name:en") or 
                            tags.get("name:en-GB") or
                            tags.get("name:en-US") or
+                           tags.get("name") or
                            tags.get("official_name") or
                            tags.get("alt_name") or
                            tags.get("short_name"))
@@ -292,6 +303,7 @@ class PlacesAgent:
                             places.append(name.strip())
                             seen_names.add(name.strip())
             
+            print(f"[DEBUG] Extracted {len(places)} places from Overpass")
             return places
             
         except requests.exceptions.RequestException as e:

@@ -75,6 +75,7 @@ class TourismAgent:
     def determine_user_intent(self, user_input: str) -> Dict[str, Any]:
         """
         Determine what the user wants: weather, places, or both
+        Prioritizes showing only what user explicitly asks for
         
         Args:
             user_input: User's input text
@@ -84,22 +85,44 @@ class TourismAgent:
         """
         user_lower = user_input.lower()
         
+        # Check for explicit weather keywords
         wants_weather = any(keyword in user_lower for keyword in [
-            'temperature', 'temp', 'weather', 'rain', 'forecast', 'climate'
+            'temperature', 'temp', 'weather', 'rain', 'forecast', 'climate', 
+            'how hot', 'how cold', 'what is the temperature', 'what\'s the temperature'
         ])
         
+        # Check for explicit places keywords (more specific to avoid false positives)
         wants_places = any(keyword in user_lower for keyword in [
-            'places', 'attractions', 'visit', 'see', 'tourist', 'sightseeing', 'go to'
+            'places', 'attractions', 'tourist', 'sightseeing', 
+            'where to go', 'what to see', 'what can i visit', 'where can i go',
+            'plan my trip', 'let\'s plan', 'places i can', 'places to visit'
         ])
         
-        # If neither is explicitly mentioned, assume both
-        if not wants_weather and not wants_places:
-            wants_weather = True
-            wants_places = True
+        # If user asks for weather but NOT places, show only weather
+        if wants_weather and not wants_places:
+            return {
+                'weather': True,
+                'places': False
+            }
         
+        # If user asks for places but NOT weather, show only places
+        if wants_places and not wants_weather:
+            return {
+                'weather': False,
+                'places': True
+            }
+        
+        # If user asks for both, show both
+        if wants_weather and wants_places:
+            return {
+                'weather': True,
+                'places': True
+            }
+        
+        # Default: if neither is explicitly mentioned, show places only
         return {
-            'weather': wants_weather,
-            'places': wants_places
+            'weather': False,
+            'places': True
         }
     
     def get_coordinates(self, place_name: str) -> Optional[Tuple[float, float]]:

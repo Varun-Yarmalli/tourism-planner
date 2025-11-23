@@ -22,40 +22,17 @@ wheels/
 
 # Virtual Environment
 venv/
-ENV/
 env/
-.venv
+ENV/
+.env
+.venv/
 
-# IDE
+# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Environment variables
-.env
-.env.local
-
-# Logs
-*.log
-
-# Flask
-instance/
-.webassets-cache
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
