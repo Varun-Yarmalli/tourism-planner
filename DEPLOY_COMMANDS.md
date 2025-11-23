@@ -21,4 +21,11 @@ git push -u origin main
    - **Start Command**: `gunicorn app:app`
 5. Click **Create Web Service**
 
-Your app will be live in minutes! 🚀
+## 3. Deploy to Vercel (Alternative)
+1. Go to [vercel.com](https://vercel.com)
+2. Click **Add New...** -> **Project**
+3. Import your GitHub repository (`tourism-planner`)
+4. Vercel will automatically detect the `vercel.json` configuration
+5. Click **Deploy**
+
+Your app will be live instantly! ⚡
