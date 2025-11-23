@@ -1,144 +1,137 @@
-# Multi-Agent Tourism System 🌍
+ Tourism-Planner System
 
-A fast, intelligent multi-agent system that helps users plan their trips by providing weather information and tourist attraction suggestions for any city worldwide.
+This project is a fast and intelligent multi-agent system designed to help users plan their trips by providing real-time weather information and curated tourist attraction suggestions for any city around the world.
 
-## 🚀 Features
+Features
 
-- ✅ **Fast Processing**: Parallel API calls and intelligent caching for quick responses
-- ✅ **Case-Insensitive**: Works with any capitalization (bangalore, BANGALORE, Bangalore)
-- ✅ **Spelling Tolerance**: Handles minor spelling mistakes intelligently
-- ✅ **Global Coverage**: Supports all cities worldwide
-- ✅ **Weather Information**: Current temperature and precipitation probability
-- ✅ **Tourist Attractions**: Up to 5 curated places to visit
-- ✅ **Smart Error Handling**: Graceful handling of non-existent places
-- ✅ **Natural Language Processing**: Understands various query formats
-- ✅ **No API Keys Required**: Uses open-source APIs
+Fast response times through parallel processing and intelligent caching
 
-## 🏗️ Architecture
+Works regardless of capitalization
 
-- **Parent Agent**: Tourism AI Agent (`tourism_agent.py`) - Orchestrates the entire system
-- **Child Agent 1**: Weather Agent (`weather_agent.py`) - Fetches weather data using Open-Meteo API
-- **Child Agent 2**: Places Agent (`places_agent.py`) - Fetches tourist attractions using Overpass API
+Handles minor spelling mistakes
 
-## APIs Used
+Supports cities worldwide
 
-1. **Open-Meteo API** - Weather data
-   - Endpoint: https://api.open-meteo.com/v1/forecast
-   
-2. **Nominatim API** - Geocoding (place name to coordinates)
-   - Endpoint: https://nominatim.openstreetmap.org/search
-   
-3. **Overpass API** - Tourist attractions (OpenStreetMap data)
-   - Endpoint: https://overpass-api.de/api/interpreter
+Provides current temperature and precipitation probability
 
-## 📦 Installation
+Suggests up to five tourist attractions
 
-1. Clone the repository:
-```bash
+Robust error handling to manage incorrect or unknown locations
+
+Natural language understanding for flexible query formats
+
+Uses open-source APIs, so no API keys are required
+
+Architecture Overview
+
+Tourism AI Agent (tourism_agent.py): The parent agent that coordinates the entire workflow
+
+Weather Agent (weather_agent.py): A child agent that retrieves weather data from the Open-Meteo API
+
+Places Agent (places_agent.py): A child agent that retrieves tourist attraction data from the Overpass API
+
+APIs Used
+
+Open-Meteo API for weather forecasting
+
+Nominatim API for geocoding (converting place names to coordinates)
+
+Overpass API for retrieving tourist attractions from OpenStreetMap data
+
+Installation
+
+Clone the repository:
+
 git clone https://github.com/YOUR_USERNAME/multi-agent-tourism-system.git
 cd multi-agent-tourism-system
-```
 
-2. Install dependencies:
-```bash
+
+Install the required dependencies:
+
 pip install -r requirements.txt
-```
 
-## 🚀 Usage
+Usage
+Running Locally
 
-### Local Development
+Start the Flask server:
 
-Run the Flask web server:
-```bash
 python app.py
-```
 
-Then open your browser to: `http://localhost:5000`
 
-### Command Line Interface
+Then open the browser at:
+http://localhost:5000
 
-Run the CLI version:
-```bash
+Command Line Interface
+
+Run the CLI mode:
+
 python main.py
-```
 
-### Example Queries
+Example Queries
 
-1. **Places only:**
-   ```
-   I'm going to go to Bangalore, let's plan my trip.
-   ```
+I am going to Bangalore, let's plan my trip.
 
-2. **Weather only:**
-   ```
-   I'm going to go to Bangalore, what is the temperature there
-   ```
+I am going to Bangalore, what is the temperature there.
 
-3. **Both weather and places:**
-   ```
-   I'm going to go to Bangalore, what is the temperature there? And what are the places I can visit?
-   ```
+I am going to Bangalore, what is the temperature and what places can I visit.
 
-## How It Works
+System Workflow
 
-1. User enters a query with a place name
-2. Parent Agent extracts the place name and determines user intent (weather, places, or both)
-3. Parent Agent uses Nominatim API to get coordinates (validates place exists)
-4. If place doesn't exist, returns error message
-5. If weather requested, Weather Agent fetches data from Open-Meteo API
-6. If places requested, Places Agent fetches attractions from Overpass API
-7. Parent Agent formats and returns the combined response
+The user enters a query that contains a place name.
 
-## 🌐 Deployment
+The parent agent identifies the place and determines whether the user wants weather information, tourist places, or both.
 
-### Deploy to Heroku
+The system uses the Nominatim API to convert the place name into coordinates and verify that the location exists.
 
-1. Install Heroku CLI
-2. Login: `heroku login`
-3. Create app: `heroku create your-app-name`
-4. Deploy: `git push heroku main`
+If the place is invalid, the system returns a clear error message.
 
-### Deploy to Railway
+If weather information is needed, the Weather Agent fetches it from Open-Meteo.
 
-1. Connect your GitHub repository to Railway
-2. Railway will auto-detect Python and deploy
-3. Set PORT environment variable (auto-set by Railway)
+If tourist attractions are needed, the Places Agent retrieves them from the Overpass API.
 
-### Deploy to Render
+The parent agent combines and formats the output before returning it to the user.
 
-1. Connect your GitHub repository to Render
-2. Select "Web Service"
-3. Build command: `pip install -r requirements.txt`
-4. Start command: `python app.py`
+Deployment Options
+Heroku
 
-## 🔧 Performance Optimizations
+Install the Heroku CLI
 
-- **Parallel Processing**: Weather and places fetched simultaneously
-- **Coordinate Caching**: Repeated queries are instant
-- **Optimized Queries**: Combined API calls for faster results
-- **Smart Matching**: Fuzzy matching handles spelling mistakes
+Run heroku login
 
-## 📝 Example Queries
+Create an app and push your code
 
-Try these (all work with any capitalization):
+Railway
 
-- `im going to bangalore` (lowercase)
-- `I'm going to go to Paris` (mixed case)
-- `visit tokyo` (simple)
-- `trip to new york` (any format)
-- `going to london, what is the temperature there?`
+Connect the repository to Railway
 
-## 🛠️ Error Handling
+Railway automatically detects the environment and deploys
 
-- Non-existent places: Returns "I don't know this place exists..."
-- API failures: Gracefully handles errors and provides user-friendly messages
-- Invalid input: Prompts user to provide valid place names
+Render
 
-## 📄 License
+Connect the repository to Render
 
-This project is open source and available under the MIT License.
+Select Web Service
 
-## 🤝 Contributing
+Use the standard Python build and start commands
 
-Contributions, issues, and feature requests are welcome!
+Performance Improvements
 
+Weather and place data are fetched in parallel
+
+Coordinates are cached to speed up repeated queries
+
+API calls are optimized to reduce response time
+
+Fuzzy matching is used to handle spelling errors
+
+Error Handling
+
+Unknown locations generate a clear and friendly error
+
+API failures are handled gracefully
+
+Users are prompted for valid inputs when needed
+
+Contributing
+
+Contributions, suggestions, and feature requests are welcome.
