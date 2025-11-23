@@ -42,8 +42,8 @@ Installation
 
 Clone the repository:
 
-git clone https://github.com/YOUR_USERNAME/multi-agent-tourism-system.git
-cd multi-agent-tourism-system
+git clone https://github.com/YOUR_USERNAME/tourism-planner
+cd tourism-planner
 
 
 Install the required dependencies:
